@@ -83,7 +83,3 @@ uploads/
 *.ntvs*
 *.njsproj
 *.sln
-
-# Render deployment (contains secrets — managed locally)
-render.yaml
-render.local.yaml
