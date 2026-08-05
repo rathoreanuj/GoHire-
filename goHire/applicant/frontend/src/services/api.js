@@ -38,19 +38,12 @@ api.interceptors.response.use(
     // Network errors
     if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
       console.error('Network Error:', error);
-      window.location.href = '/error?code=503&message=Cannot connect to server';
     }
 
     // Unauthorized
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-    }
-
-    // Server errors (500+)
-    if (error.response?.status >= 500) {
-      const msg = error.response.data?.error || 'Server error';
-      window.location.href = `/error?code=${error.response.status}&message=${encodeURIComponent(msg)}`;
     }
 
     return Promise.reject(error);

@@ -27,30 +27,17 @@ const login = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Generate OTP for 2FA
-    const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    // Set session user directly upon successful password match
+    req.session.user = {
+      email: user.email,
+      isPremium: user.isPremium
+    };
 
-    user.otp = otp;
-    user.otpExpiry = otpExpiry;
-
-    try {
-      const otpDeliveryResult = await sendOtpEmail(email, otp);
-      res.json({
-        success: true,
-        require2FA: true,
-        email: user.email,
-        message: otpDeliveryResult?.delivered
-          ? 'OTP sent to your email for 2-factor authentication'
-          : 'OTP generated for 2-factor authentication. Check server console in local/dev mode.'
-      });
-    } catch (emailError) {
-      console.error('2FA OTP email error:', emailError);
-      return res.status(500).json({
-        success: false,
-        error: emailError.message || 'Failed to send 2FA OTP. Please try again later.'
-      });
-    }
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      user: req.session.user
+    });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Internal server error" });

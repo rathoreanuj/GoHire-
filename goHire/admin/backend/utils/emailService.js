@@ -74,13 +74,31 @@ const sendOtpEmail = async (email, otp) => {
                     resolve({ success: true, delivered: true });
                 } else {
                     console.error('❌ EmailJS Error:', responseData);
-                    reject(new Error(`EmailJS Error ${res.statusCode}: ${responseData}`));
+                    if (process.env.NODE_ENV !== 'production') {
+                        console.warn(`🔑 [DEV MODE FALLBACK] EmailJS failed (${res.statusCode}: ${responseData}). OTP for ${email} is: ${otp}`);
+                        resolve({
+                            success: true,
+                            delivered: false,
+                            message: 'EmailJS failed. OTP logged to server console for local testing.'
+                        });
+                    } else {
+                        reject(new Error(`EmailJS Error ${res.statusCode}: ${responseData}`));
+                    }
                 }
             });
         });
 
         req.on('error', (error) => {
-            reject(new Error(`Network error: ${error.message}`));
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn(`🔑 [DEV MODE FALLBACK] EmailJS network error (${error.message}). OTP for ${email} is: ${otp}`);
+                resolve({
+                    success: true,
+                    delivered: false,
+                    message: 'EmailJS network error. OTP logged to server console for local testing.'
+                });
+            } else {
+                reject(new Error(`Network error: ${error.message}`));
+            }
         });
 
         req.write(postData);

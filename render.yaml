@@ -1,0 +1,71 @@
+services:
+  # Applicant Backend Microservice
+  - type: web
+    name: gohire-applicant-backend
+    env: node
+    rootDir: goHire/applicant/backend
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_applicants?retryWrites=true&w=majority&appName=GoHire
+      - key: MONGO_URI_RECRUITERS
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_recruiters?retryWrites=true&w=majority&appName=GoHire
+      - key: SESSION_SECRET
+        value: applicant-secret-key-change-me
+      - key: REDIS_URL
+        value: rediss://default:gQAAAAAAARarAAIncDJkMTllM2I3NzI3ZmU0OGE4ODA0ZDQ3NGRkZGIyZTQ4NHAyNzEzMzk@settling-crab-71339.upstash.io:6379
+      - key: FRONTEND_URL
+        value: https://gohire-applicant.vercel.app
+
+  # Recruiter Backend Microservice
+  - type: web
+    name: gohire-recruiter-backend
+    env: node
+    rootDir: goHire/recruiter/backend
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_recruiters?retryWrites=true&w=majority&appName=GoHire
+      - key: MONGO_URI_RECRUITERS
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_recruiters?retryWrites=true&w=majority&appName=GoHire
+      - key: MONGO_URI_APPLICANT
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_applicants?retryWrites=true&w=majority&appName=GoHire
+      - key: SESSION_SECRET
+        value: go-hire-recruiter-secret-key
+      - key: REDIS_URL
+        value: rediss://default:gQAAAAAAARarAAIncDJkMTllM2I3NzI3ZmU0OGE4ODA0ZDQ3NGRkZGIyZTQ4NHAyNzEzMzk@settling-crab-71339.upstash.io:6379
+      - key: FRONTEND_URL
+        value: https://gohire-recruiter.vercel.app
+
+  # Admin Backend Microservice
+  - type: web
+    name: gohire-admin-backend
+    env: node
+    rootDir: goHire/admin/backend
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: PORT
+        value: 9000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI_ADMIN
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_admin?retryWrites=true&w=majority&appName=GoHire
+      - key: MONGO_URI_RECRUITERS
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_recruiters?retryWrites=true&w=majority&appName=GoHire
+      - key: MONGO_URI_APPLICANT
+        value: mongodb+srv://gohire:gohire12345678@gohire.kzwudx0.mongodb.net/goHire_applicants?retryWrites=true&w=majority&appName=GoHire
+      - key: SESSION_SECRET
+        value: admin-secret-key-change-me
+      - key: FRONTEND_URL
+        value: https://gohire-admin.vercel.app

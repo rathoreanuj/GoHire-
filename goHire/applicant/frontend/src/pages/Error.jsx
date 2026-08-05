@@ -14,7 +14,7 @@ const Error = () => {
         <p className="text-gray-600 mb-6">{decodeURIComponent(message)}</p>
         <div className="space-x-4">
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => window.location.href = '/'}
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
           >
             Try Again

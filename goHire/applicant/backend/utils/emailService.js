@@ -95,29 +95,45 @@ const sendOtpEmail = async (email, otp) => {
           console.log('EmailJS response:', responseData);
           resolve({ success: true, messageId: responseData || 'emailjs-sent' });
         } else {
-          let errorMessage = 'Failed to send OTP email. ';
-          try {
-            const errorData = JSON.parse(responseData);
-            errorMessage += errorData.text || errorData.message || `HTTP ${res.statusCode}`;
-          } catch (e) {
-            errorMessage += `HTTP ${res.statusCode}: ${responseData}`;
-          }
-
-          console.error('❌ Error sending OTP email via EmailJS');
-          console.error('Status Code:', res.statusCode);
+          console.error('❌ Error sending OTP email via EmailJS, status code:', res.statusCode);
           console.error('Response:', responseData);
 
-          const error = new Error(errorMessage);
-          error.status = res.statusCode;
-          error.response = responseData;
-          reject(error);
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn(`🔑 [DEV MODE FALLBACK] EmailJS failed (${res.statusCode}: ${responseData}). OTP for ${email} is: ${otp}`);
+            resolve({
+              success: true,
+              delivered: false,
+              message: 'EmailJS failed. OTP logged to server console for local testing.'
+            });
+          } else {
+            let errorMessage = 'Failed to send OTP email. ';
+            try {
+              const errorData = JSON.parse(responseData);
+              errorMessage += errorData.text || errorData.message || `HTTP ${res.statusCode}`;
+            } catch (e) {
+              errorMessage += `HTTP ${res.statusCode}: ${responseData}`;
+            }
+            const error = new Error(errorMessage);
+            error.status = res.statusCode;
+            error.response = responseData;
+            reject(error);
+          }
         }
       });
     });
 
     req.on('error', (error) => {
       console.error('❌ Network error sending OTP email:', error.message);
-      reject(new Error(`Network error: ${error.message}`));
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`🔑 [DEV MODE FALLBACK] EmailJS network error (${error.message}). OTP for ${email} is: ${otp}`);
+        resolve({
+          success: true,
+          delivered: false,
+          message: 'EmailJS network error. OTP logged to server console for local testing.'
+        });
+      } else {
+        reject(new Error(`Network error: ${error.message}`));
+      }
     });
 
     req.write(postData);
