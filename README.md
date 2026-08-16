@@ -108,6 +108,96 @@ graph LR
 
 ---
 
+## Database schema
+
+The project follows a MongoDB document model with several key collections and file references. The schema definitions below reflect the actual model files in the repo.
+
+### GridFS file storage
+The project stores uploaded files using MongoDB GridFS. This is especially relevant for resumes and proof documents.
+
+Typical storage pattern:
+- `uploads.files`
+- `uploads.chunks`
+
+Files are referenced by `ObjectId` from individual document schemas such as:
+- `resumeId`
+- `profileImageId`
+- `logoId`
+- `proofDocumentId`
+
+### Relationship diagram
+```mermaid
+erDiagram
+  USER ||--o{ APPLICATION : applies
+  JOB ||--o{ APPLICATION : receives
+  COMPANY ||--o{ JOB : owns
+  COMPANY ||--o{ INTERNSHIP : owns
+  USER ||--o{ JOB : creates
+  USER ||--o{ INTERNSHIP : creates
+  APPLICATION }o--|| GRIDFS : stores_resume
+  COMPANY }o--|| GRIDFS : stores_logo
+  COMPANY }o--|| GRIDFS : stores_proof
+
+  USER {
+    string userId
+    string firstName
+    string lastName
+    string email
+    string phone
+    string gender
+    string password
+    date memberSince
+    objectId resumeId
+    objectId profileImageId
+  }
+
+  JOB {
+    string jobTitle
+    string jobDescription
+    string jobRequirements
+    number jobSalary
+    string jobLocation
+    string jobType
+    number jobExperience
+    number noofPositions
+    objectId jobCompany
+    objectId createdBy
+    date jobExpiry
+  }
+
+  APPLICATION {
+    string userId
+    string jobId
+    string firstName
+    string lastName
+    string email
+    string phone
+    string gender
+    objectId resumeId
+    boolean isSelected
+    boolean isRejected
+    date AppliedAt
+  }
+
+  COMPANY {
+    string companyName
+    string website
+    string location
+    objectId logoId
+    objectId createdBy
+    boolean verified
+    objectId proofDocumentId
+  }
+
+  GRIDFS {
+    objectId _id
+    string filename
+    date uploadDate
+  }
+```
+
+---
+
 ## Request/data flow
 
 ### 1. User login flow
